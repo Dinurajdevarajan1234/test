@@ -1,0 +1,75 @@
+version: "3.8"
+
+services:
+  cloud-router:
+    image: frrouting/frr:latest
+    container_name: cloud-router
+    privileged: true
+    volumes:
+      - ./cloud-router/frr.conf:/etc/frr/frr.conf
+    networks:
+      tata-net:
+        ipv4_address: 192.168.210.3
+      airtel-net:
+        ipv4_address: 192.168.220.3
+
+  tata-router:
+    image: frrouting/frr:latest
+    container_name: tata-router
+    privileged: true
+    volumes:
+      - ./tata-router/frr.conf:/etc/frr/frr.conf
+    networks:
+      tata-net:
+        ipv4_address: 192.168.210.2
+      tata-onprem:
+        ipv4_address: 192.168.230.2
+
+  airtel-router:
+    image: frrouting/frr:latest
+    container_name: airtel-router
+    privileged: true
+    volumes:
+      - ./airtel-router/frr.conf:/etc/frr/frr.conf
+    networks:
+      airtel-net:
+        ipv4_address: 192.168.220.2
+      airtel-onprem:
+        ipv4_address: 192.168.240.2
+
+  onprem-router:
+    image: frrouting/frr:latest
+    container_name: onprem-router
+    privileged: true
+    volumes:
+      - ./onprem-router/frr.conf:/etc/frr/frr.conf
+    networks:
+      tata-onprem:
+        ipv4_address: 192.168.230.3
+      airtel-onprem:
+        ipv4_address: 192.168.240.3
+
+networks:
+  tata-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.210.0/24
+
+  airtel-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.220.0/24
+
+  tata-onprem:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.230.0/24
+
+  airtel-onprem:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.240.0/24
