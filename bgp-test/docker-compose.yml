@@ -48,7 +48,22 @@ services:
         ipv4_address: 192.168.230.3
       airtel-onprem:
         ipv4_address: 192.168.240.3
+  test-client-onprem:
+    image: nicolaka/netshoot
+    container_name: test-client-onprem
+    command: sleep infinity
+    networks:
+      tata-onprem:
+      airtel-onprem:
 
+  test-client-cloud:
+    image: nicolaka/netshoot
+    container_name: test-client-cloud
+    command: sleep infinity
+    networks:
+      tata-net:
+      airtel-net:
+      
 networks:
   tata-net:
     driver: bridge
