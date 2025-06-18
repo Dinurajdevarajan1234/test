@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  cloud-router:
+    image: frrouting/frr:latest
+    container_name: cloud-router
+    privileged: true
+    networks:
+      bgp-net:
+        ipv4_address: 192.168.100.1
+    volumes:
+      - ./configs/cloud-router:/etc/frr
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+
+  isp-tata:
+    image: frrouting/frr:latest
+    container_name: isp-tata
+    privileged: true
+    networks:
+      bgp-net:
+        ipv4_address: 192.168.100.2
+    volumes:
+      - ./configs/isp-tata:/etc/frr
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+
+  isp-airtel:
+    image: frrouting/frr:latest
+    container_name: isp-airtel
+    privileged: true
+    networks:
+      bgp-net:
+        ipv4_address: 192.168.100.3
+    volumes:
+      - ./configs/isp-airtel:/etc/frr
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+
+  onprem-router:
+    image: frrouting/frr:latest
+    container_name: onprem-router
+    privileged: true
+    networks:
+      bgp-net:
+        ipv4_address: 192.168.100.4
+    volumes:
+      - ./configs/onprem-router:/etc/frr
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+
+  batfish:
+    image: batfish/allinone
+    container_name: batfish
+    ports:
+      - "9997:9997"
+      - "9996:9996"
+    volumes:
+      - ./batfish-snapshots:/snapshots
+    tty: true
+
+  notebook:
+    image: ghcr.io/batfish/pybatfish-notebooks:latest
+    container_name: batfish-notebook
+    ports:
+      - "8888:8888"
+    depends_on:
+      - batfish
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./batfish-snapshots:/home/jovyan/snapshots
+
+networks:
+  bgp-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
